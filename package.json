@@ -25,5 +25,12 @@
 		"node",
 		"gomix",
 		"express"
-	]
+	],
+	"quokka": {
+		"env": {
+			"params": {
+				"env": "NODE_ENV=test"
+			}
+		}
+	}
 }
