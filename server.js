@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
+mongoose.Promise = global.Promise
 mongoose.connect(
   process.env.URI || 'mongodb://localhost/exercise-track',
   {useMongoClient: true}
