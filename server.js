@@ -26,6 +26,40 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// ===========================================================
+const userSchema = new mongoose.Schema({
+  username: String,
+})
+
+const User = mongoose.model('user', userSchema)
+
+// Add new user
+app.post('/api/exercise/new-user', (req, res) => {
+  const { username } = req.body
+  User.findOne({username: username}, (err, doc) => {
+    if (err) {
+      console.log(err)
+    } else 
+    if (doc) {
+      res.json({error: "username already exists"})
+    } else {
+      new User({
+        username: username
+      })
+      .save((err, doc) => {
+        err
+        ? console.log("failed to add user", err)
+        : res.json({
+          username: doc.username,
+          id: doc._id
+        })
+      })
+    }
+  })
+})
+
+//========================================
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
@@ -49,6 +83,9 @@ app.use((err, req, res, next) => {
   res.status(errCode).type('txt')
     .send(errMessage)
 })
+
+//================================================
+
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
