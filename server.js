@@ -26,24 +26,32 @@ app.get('/', (req, res) => {
 });
 
 // ===========================================================
+
 const userSchema = new mongoose.Schema({
   username: String,
+  exerciseLog: [
+    {
+      description: String,
+      duration: String,
+      date: Date
+    }
+  ]
 })
 
-const User = mongoose.model('user', userSchema)
+const UserModel = mongoose.model('user', userSchema)
 
 // Add new user
 
 app.post('/api/exercise/new-user', (req, res) => {
   const { username } = req.body
-  User.findOne({username: username}, (err, doc) => {
+  UserModel.findOne({username: username}, (err, doc) => {
     if (err) {
       console.log(err)
     } else 
     if (doc) {
       res.json({error: "username already exists"})
     } else {
-      new User({
+      new UserModel({
         username: username
       })
       .save((err, doc) => {
@@ -60,9 +68,9 @@ app.post('/api/exercise/new-user', (req, res) => {
 
 // Get All Users
 
-app.get('/api/exercise/users', async (req, res) => {
+app.get('/api/exercise/users', async(req, res) => {
   try {
-    const docs = await User.find({})
+    const docs = await UserModel.find({})
     const users = docs.map((user) => {
       return {
         username: user.username,
@@ -73,6 +81,41 @@ app.get('/api/exercise/users', async (req, res) => {
   } 
   catch (err) {
     throw err
+  }
+})
+
+
+// Add exercise
+
+app.post('/api/exercise/add', async(req, res) => {
+
+  const{ date, description, duration, userId} = req.body
+  const update = {
+    description: description,
+    duration: duration,
+    date: date || Date.now()
+  }
+  console.log(update)
+  try {
+    const doc = await UserModel.findByIdAndUpdate(
+      userId,
+      {$push: {exerciseLog: update}}
+      )
+    if (!doc) {
+      res.json({error: "unknown _id"})
+    } else {
+      const user = {
+        username: doc.username,
+        _id: doc._id,
+        description: update.description,
+        duration: update.duration,
+        date: update.date
+      }
+      res.json(user)
+    }
+  }
+  catch (err) {
+    res.json({error: "unknown _id"})
   }
 })
 
