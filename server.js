@@ -5,7 +5,14 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
+mongoose.connect(
+  process.env.URI || 'mongodb://localhost/exercise-track',
+  {useMongoClient: true}
+  )
+  .then(
+    () => {console.log("mongoose is connect to db")},
+    (err) => {console.log("mongoose connection error", err)}
+  )
 
 app.use(cors())
 
@@ -17,7 +24,6 @@ app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
-
 
 // Not found middleware
 app.use((req, res, next) => {
