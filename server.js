@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('user', userSchema)
 
 // Add new user
+
 app.post('/api/exercise/new-user', (req, res) => {
   const { username } = req.body
   User.findOne({username: username}, (err, doc) => {
@@ -55,6 +56,24 @@ app.post('/api/exercise/new-user', (req, res) => {
       })
     }
   })
+})
+
+// Get All Users
+
+app.get('/api/exercise/users', async (req, res) => {
+  try {
+    const docs = await User.find({})
+    const users = docs.map((user) => {
+      return {
+        username: user.username,
+        _id: user._id
+      }
+    })
+    res.json(users)
+  } 
+  catch (err) {
+    throw err
+  }
 })
 
 //========================================
