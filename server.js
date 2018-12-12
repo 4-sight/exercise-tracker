@@ -100,6 +100,8 @@ app.post('/api/exercise/add', async(req, res) => {
     date: date 
   }
 
+  if(!date) {throw(res.json({error: "invalid date"}))}
+
   try {
     const doc = await UserModel.findOneAndUpdate(
       {_id: userId},
