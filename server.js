@@ -1,9 +1,11 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-
 const cors = require('cors')
 const mongoose = require('mongoose')
+const dateModule = require('./src/dateHandler')
+const dateHandler = dateModule.dateHandler
+
 mongoose.Promise = global.Promise
 mongoose.connect(
   process.env.URI,
@@ -15,12 +17,13 @@ mongoose.connect(
   )
 
 app.use(cors())
-
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-
-
 app.use(express.static('public'))
+app.use('/api/exercise/add', (req, res, next) => {
+  req.body.date = dateHandler(req.body.date)
+  next()
+})
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
@@ -90,15 +93,16 @@ app.get('/api/exercise/users', async(req, res) => {
 app.post('/api/exercise/add', async(req, res) => {
 
   const{ date, description, duration, userId} = req.body
+
   const update = {
     description: description,
     duration: duration,
-    date: date || Date.now()
+    date: date 
   }
-  console.log(update)
+
   try {
-    const doc = await UserModel.findByIdAndUpdate(
-      userId,
+    const doc = await UserModel.findOneAndUpdate(
+      {_id: userId},
       {$push: {exerciseLog: update}}
       )
     if (!doc) {
@@ -115,9 +119,10 @@ app.post('/api/exercise/add', async(req, res) => {
     }
   }
   catch (err) {
-    res.json({error: "unknown _id"})
+    res.json({error: "invalid entry"})
   }
 })
+
 
 //========================================
 
