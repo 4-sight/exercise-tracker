@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
     {
       description: String,
       duration: String,
-      date: Date
+      date: String
     }
   ]
 })
@@ -93,7 +93,7 @@ app.get('/api/exercise/users', async(req, res) => {
 app.post('/api/exercise/add', async(req, res) => {
 
   const{ date, description, duration, userId} = req.body
-
+  console.log(date)
   const update = {
     description: description,
     duration: duration,
@@ -123,6 +123,25 @@ app.post('/api/exercise/add', async(req, res) => {
   }
 })
 
+
+// GET exercise log
+
+app.get('/api/exercise/log', async(req, res) => {
+  const { userId, from, to, limit} = req.query
+  console.log('query', req.query)
+  try {
+    const doc = await UserModel.findById(userId)
+    console.log(doc)
+    res.json({
+      username: doc.username,
+      userId: doc._id,
+      exerciseLog: doc.exerciseLog
+    })
+  }
+  catch(err) {
+    res.json({error: "unable to fetch user log"})
+  }
+})
 
 //========================================
 
