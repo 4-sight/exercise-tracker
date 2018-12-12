@@ -93,7 +93,7 @@ app.get('/api/exercise/users', async(req, res) => {
 app.post('/api/exercise/add', async(req, res) => {
 
   const{ date, description, duration, userId} = req.body
-  console.log(date)
+
   const update = {
     description: description,
     duration: duration,
