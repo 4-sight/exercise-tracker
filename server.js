@@ -128,19 +128,39 @@ app.post('/api/exercise/add', async(req, res) => {
 
 app.get('/api/exercise/log', async(req, res) => {
   const { userId, from, to, limit} = req.query
-  console.log('query', req.query)
+
   try {
     const doc = await UserModel.findById(userId)
-    console.log(doc)
+
+    const startDate =
+    from
+    ? new Date(from)
+    : new Date("0000-01-01")
+
+    const endDate =
+    to
+    ? new Date(to)
+    : new Date("9999-12-12")
+
+    let mappedLog = doc.exerciseLog.filter(
+      (entry) => {
+        const date = new Date(entry.date)
+        if (date >= startDate && date <= endDate) {
+          return entry
+        }
+      }
+    )
+
     res.json({
       username: doc.username,
       userId: doc._id,
-      exerciseLog: doc.exerciseLog
+      exerciseLog: limit ? mappedLog.slice(0, limit) : mappedLog
     })
   }
   catch(err) {
     res.json({error: "unable to fetch user log"})
   }
+  
 })
 
 //========================================
